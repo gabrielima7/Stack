@@ -201,6 +201,15 @@ def safe_from(
     return cast(SafeFromDecorator[E], decorator)
 
 
+def _extract_ok_values(
+    results: list[Result[T, E]] | tuple[Result[T, E], ...],
+) -> Result[list[T], E] | None:
+    try:
+        return Ok([r.ok_value for r in results])  # type: ignore[union-attr,misc]
+    except AttributeError:
+        return None
+
+
 def _collect_list(
     results: list[Result[T, E]] | tuple[Result[T, E], ...],
 ) -> Result[list[T], E] | None:
@@ -213,10 +222,7 @@ def _collect_list(
     first = results[0]
     # Fast path: homogeneous exact types
     if type(first) is Ok:
-        try:
-            return Ok([r.ok_value for r in results])  # type: ignore[union-attr,misc]
-        except AttributeError:
-            pass
+        return _extract_ok_values(results)
 
     return None
 
