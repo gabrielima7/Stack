@@ -314,22 +314,26 @@ class CircuitBreaker:
         except (TypeError, ValueError):
             return 30.0
 
+    def _calculate_safe_elapsed(
+        self, parsed_failure: object, safe_timeout: float, now: float
+    ) -> float:
+        try:
+            val = float(parsed_failure)  # type: ignore[arg-type]
+            if not math.isfinite(val):
+                return safe_timeout
+            elapsed = now - val
+            if elapsed < 0:
+                return safe_timeout
+            return elapsed
+        except Exception:
+            return safe_timeout
+
     def _compute_elapsed(
         self, last_failure: float | None, safe_timeout: float, now: float
     ) -> float | None:
         if not isinstance(last_failure, (int, float)):
             return None
-
-        try:
-            if not math.isfinite(last_failure):
-                return safe_timeout
-            elapsed = now - float(last_failure)
-        except Exception:
-            return safe_timeout
-
-        if elapsed < 0:
-            return safe_timeout
-        return elapsed
+        return self._calculate_safe_elapsed(last_failure, safe_timeout, now)
 
     def _calculate_elapsed_time(self, now: float) -> float | None:
         """Calculate time elapsed since last failure."""
