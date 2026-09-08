@@ -208,15 +208,25 @@ def _truncate_filename(safe_stem: str, suffix: str, max_length: int) -> str:
     return result
 
 
-def _is_filename_safe(filename: str, max_length: int, stem: str) -> bool:
-    """Check if a filename is already safe without any modifications."""
+def _is_basic_safe(filename: str, max_length: int, stem: str) -> bool:
     return (
         len(filename) <= max_length
         and filename not in {"..", "."}
         and stem.upper() not in _WINDOWS_RESERVED_NAMES
-        and filename.isascii()
-        and filename.replace(".", "").replace("-", "").replace("_", "").isalnum()
     )
+
+
+def _is_alphanum_safe(filename: str) -> bool:
+    if not filename.isascii():
+        return False
+    return filename.replace(".", "").replace("-", "").replace("_", "").isalnum()
+
+
+def _is_filename_safe(filename: str, max_length: int, stem: str) -> bool:
+    """Check if a filename is already safe without any modifications."""
+    if not _is_basic_safe(filename, max_length, stem):
+        return False
+    return _is_alphanum_safe(filename)
 
 
 def _finalize_filename(
