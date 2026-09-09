@@ -219,6 +219,13 @@ def _is_filename_safe(filename: str, max_length: int, stem: str) -> bool:
     )
 
 
+def _handle_reserved_names(safe_stem: str, replacement: str) -> str:
+    """Handle Windows reserved names by prepending the replacement character."""
+    if safe_stem.upper() in _WINDOWS_RESERVED_NAMES:
+        return f"{replacement}{safe_stem}"
+    return safe_stem
+
+
 def _finalize_filename(
     safe_stem: str,
     replacement: str,
@@ -226,9 +233,7 @@ def _finalize_filename(
     max_length: int,
 ) -> str:
     """Finalize the sanitized filename by handling reserved names and empty results."""
-    # Handle reserved names (Windows)
-    if safe_stem.upper() in _WINDOWS_RESERVED_NAMES:
-        safe_stem = f"{replacement}{safe_stem}"
+    safe_stem = _handle_reserved_names(safe_stem, replacement)
 
     # Handle empty result
     if not safe_stem:
@@ -373,6 +378,21 @@ def _clean_path_parts(path: Path) -> list[str]:
     return parts
 
 
+def _resolve_base_dir(sanitized: Path, base: Path, resolve: bool) -> Path:
+    """Resolve the path or make it absolute relative to base."""
+    if resolve:
+        try:
+            return sanitized.resolve()
+        except (OSError, RuntimeError) as e:
+            msg = f"Cannot resolve path: {e}"
+            raise ValueError(msg) from e
+
+    if not sanitized.is_absolute():
+        return base / sanitized
+
+    return sanitized
+
+
 def _apply_base_dir_constraint(
     sanitized: Path,
     base_dir: Path | str | None,
@@ -383,18 +403,7 @@ def _apply_base_dir_constraint(
         return sanitized
 
     base = Path(base_dir).resolve()
-    if resolve:
-        try:
-            return sanitized.resolve()
-        except (OSError, RuntimeError) as e:
-            msg = f"Cannot resolve path: {e}"
-            raise ValueError(msg) from e
-
-    # Make absolute relative to base
-    if not sanitized.is_absolute():
-        return base / sanitized
-
-    return sanitized
+    return _resolve_base_dir(sanitized, base, resolve)
 
 
 def _process_string_path(path: str) -> Path:
