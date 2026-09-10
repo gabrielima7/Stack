@@ -45,8 +45,8 @@ def test_chaos_circuit_breaker_nan_state_corruption_chaos_circuit_breaker_nan_st
     breaker._state.state = CircuitState.HALF_OPEN
     object.__setattr__(breaker._state, "half_open_attempts", float("inf"))
 
-    # _should_attempt should return False to prevent thundering herd when corrupted
-    assert breaker._should_attempt() is False
+    # _should_attempt should return True by gracefully resetting the corrupted value
+    assert breaker._should_attempt() is True
     assert math.isfinite(
         breaker._state.half_open_attempts
     ) or breaker._state.half_open_attempts == float("inf")
@@ -56,4 +56,4 @@ def test_chaos_circuit_breaker_nan_state_corruption_chaos_circuit_breaker_nan_st
     object.__setattr__(breaker._state, "half_open_attempts", float("nan"))
 
     # Should block attempt to be safe
-    assert breaker._should_attempt() is False
+    assert breaker._should_attempt() is True

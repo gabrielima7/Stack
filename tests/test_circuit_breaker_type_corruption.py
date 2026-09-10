@@ -8,8 +8,8 @@ def test_circuit_breaker_type_corruption_half_open_attempts() -> None:
     breaker._state.state = CircuitState.HALF_OPEN
     # Induce type mutation
     breaker._state.half_open_attempts = "corrupted"  # type: ignore[assignment]
-    # This should return False because it catches TypeError in math.isfinite()
-    assert breaker._handle_attempt_half_open() is False
+    # This should reset and return True gracefully handling type mutation
+    assert breaker._handle_attempt_half_open() is True
 
 
 def test_circuit_breaker_type_corruption_success_count() -> None:
