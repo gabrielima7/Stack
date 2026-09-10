@@ -392,7 +392,7 @@ class CircuitBreaker:
 
     def _handle_attempt_half_open(self) -> bool:
         if not self._is_valid_metric(self._state.half_open_attempts):
-            return False
+            self._state.half_open_attempts = 0
 
         success_threshold = self._get_safe_threshold(
             self.config.success_threshold,

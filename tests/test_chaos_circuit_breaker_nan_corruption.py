@@ -66,7 +66,7 @@ def test_chaos_circuit_breaker_nan_corruption_circuit_breaker_corrupt_half_open_
     can_attempt = breaker._handle_attempt_half_open()
 
     # Assert
-    assert can_attempt is False
+    assert can_attempt is True
 
 
 def test_chaos_circuit_breaker_nan_corruption_circuit_breaker_corrupt_half_open_attempts_to_string():
@@ -77,7 +77,7 @@ def test_chaos_circuit_breaker_nan_corruption_circuit_breaker_corrupt_half_open_
 
     can_attempt = breaker._handle_attempt_half_open()
 
-    assert can_attempt is False
+    assert can_attempt is True
 
 
 def test_chaos_circuit_breaker_nan_corruption_circuit_breaker_record_success_open_state():
