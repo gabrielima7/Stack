@@ -19,6 +19,7 @@ hide:
 ### ✨ What's New in v0.6.3
 
 - **Security & Resilience**: Hardened RateLimiter against extreme type mutations (e.g., custom mutated types like strings masquerading as numbers) and anomalous mathematical operations that could crash the service. Operations are now gracefully handled via `try...except Exception` blocks, falling back to safe defaults or returning appropriate `Err` states (PR #1139).
+- **Clean Code & Refactoring**: Extracted validation logic into helpers and applied guard clauses in `result.py` and `circuit_breaker.py` to reduce nesting and cyclomatic complexity (PR #1195).
 
 ### ✨ What's New in v0.6.2
 

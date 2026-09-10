@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Circuit Breaker Cyclomatic Complexity**: Reduced cyclomatic complexity in `CircuitBreaker` by refactoring lock acquisition and state checks into unified helper methods (PR #1154).
 - **Resilience Enum Identity Checks**: Updated `CircuitState` enum comparisons across the resilience module (Circuit Breaker, Health Pinger) to use identity checks (`is`, `is not`) instead of equality checks to prevent exceptions from `__eq__` overrides (PR #1155).
 - **Adaptive Bulkhead Typing**: Enhanced typing for `Adaptive Bulkhead` by explicitly using `Coroutine` instead of `Awaitable` for internal async tasks to resolve strict mypy typing errors (PR #1158).
+- **Cyclomatic Complexity Reductions**: Extracted validation logic into helpers and applied guard clauses in `result.py` and `circuit_breaker.py` to reduce nesting and cyclomatic complexity (PR #1195).
 
 ## [0.6.2] - 2026-08-17
 
